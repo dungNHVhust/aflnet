@@ -1096,8 +1096,19 @@ int send_over_network()
       messages_sent++; // increase anyway
       // not sure how respond bytes tracker affect the algo
       // Allocate memory to store new accumulated response buffer size
-      response_bytes = (u32 *) ck_realloc_block(response_bytes, messages_sent * sizeof(u32));
-      response_bytes[messages_sent - 1] = response_buf_size; // unchanged until last one;
+
+      // response_bytes = (u32 *) ck_realloc_block(response_bytes, messages_sent * sizeof(u32));
+      // response_bytes[messages_sent - 1] = response_buf_size; // unchanged until last one;
+
+      //Fix Cause segmentation fault
+      u32 *temp = (u32 *) ck_realloc_block(response_bytes, messages_sent * sizeof(u32));
+      if (!temp) {
+          // Xử lý lỗi khi không thể cấp phát bộ nhớ
+          fprintf(stderr, "Memory allocation failed\n");
+          exit(1);
+      }
+      response_bytes = temp;
+      response_bytes[messages_sent - 1] = response_buf_size;
     }
     timeout_flag = 0;
     n = net_send(sockfd, timeout, msgbuf, msglen, &timeout_flag);
