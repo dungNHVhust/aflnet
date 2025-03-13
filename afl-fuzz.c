@@ -1118,7 +1118,10 @@ int send_over_network()
     }
     timeout_flag = 0;
     n = net_recv(sockfd, timeout, poll_wait_msecs, &response_buf, &response_buf_size, &timeout_flag);
-    response_bytes[messages_sent - 1] = response_buf_size; // set here
+    //response_bytes[messages_sent - 1] = response_buf_size; // set here
+    if (messages_sent > 0 && response_bytes != NULL) {
+      response_bytes[messages_sent - 1] = response_buf_size;
+    }
     // allowing timeouts
     if ( n < 0 ) {
       goto HANDLE_RESPONSES;
@@ -1149,7 +1152,10 @@ int send_over_network()
       }
 
       //Update accumulated response buffer size
-      response_bytes[messages_sent - 1] = response_buf_size;
+      if (messages_sent > 0 && response_bytes != NULL) {
+        response_bytes[messages_sent - 1] = response_buf_size;
+      }
+      // response_bytes[messages_sent - 1] = response_buf_size;
 
       // set likely_buggy flag if AFLNet does not receive any feedback from the server
       // it could be a signal of a potentiall server crash, like the case of CVE-2019-7314
